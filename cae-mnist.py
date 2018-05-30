@@ -35,9 +35,8 @@ def train(options):
     x = tf.placeholder(tf.float32, [None, dim], name='x')
     # x = tf.placeholder(tf.float32, [None, 28, 28, 1], name='x')
     y = tf.placeholder(tf.float32, [None, dim])
-    keepprob = tf.placeholder(tf.float32, name='keepprob')
 
-    pred = model.cnn(x,  keepprob)  # ['out']
+    pred = model.cnn(x)  # ['out']
     cost = tf.reduce_sum(tf.square(pred - tf.reshape(y, shape=[-1, 28, 28, 1])), name='cost')
     optm = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
@@ -46,19 +45,17 @@ def train(options):
     print("Start training..")
 
     init = tf.global_variables_initializer()
-    saver = tf.train.Saver()
     with tf.Session() as sess:
-        print(x.get_shape())
+        print(pred)
         sess.run(init)
         for epoch_i in range(n_epochs):
             for batch_i in range(mnist.train.num_examples // batch_size):
                 batch_xs, _ = mnist.train.next_batch(batch_size)
                 trainbatch_noisy = batch_xs + 0.3 * np.random.randn(batch_xs.shape[0], 784)
-                sess.run(optm, feed_dict={x: trainbatch_noisy, y: batch_xs, keepprob: 0.7})
-                print("[%02d/%02d] cost: %.4f" % (epoch_i, n_epochs, sess.run(cost, feed_dict={x: trainbatch_noisy, y: batch_xs, keepprob: 1.})))
+                sess.run(optm, feed_dict={x: trainbatch_noisy, y: batch_xs})
+                # print("[%02d/%02d] cost: %.4f" % (epoch_i, n_epochs, sess.run(cost, feed_dict={x: trainbatch_noisy, y: batch_xs})))
 
-        print(out_img)
-        # print(recon)
+        print(pred)
 
         print("Save model")
         graph_def = tf.get_default_graph().as_graph_def()
