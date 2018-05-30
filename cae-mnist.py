@@ -83,25 +83,23 @@ def test():
 
         x_ = sess.graph.get_tensor_by_name('x:0')
         out_ = sess.graph.get_tensor_by_name('out_img:0')
-        keepprob_ = sess.graph.get_tensor_by_name('keepprob:0')
 
         n_examples = 1
         test_xs, _ = mnist.test.next_batch(n_examples)
         test_xs_noisy = test_xs + 0.3 * np.random.randn(test_xs.shape[0], 784)
-        recon = sess.run(out_, feed_dict={x_: test_xs_noisy, keepprob_: 1.})
+        recon = sess.run(out_, feed_dict={x_: test_xs_noisy})
         fig, axs = plt.subplots(3, n_examples, figsize=(15, 4))
 
         axs[0].matshow(np.reshape(test_xs, (28, 28)), cmap=plt.get_cmap('gray'))
         axs[1].matshow(np.reshape(test_xs_noisy, (28, 28)), cmap=plt.get_cmap('gray'))
         axs[2].matshow(np.reshape(np.reshape(recon, (784,)), (28, 28)), cmap=plt.get_cmap('gray'))
         plt.show()
-    print('test')
 
 
 def build_parser():
     parser = ArgumentParser()
     parser.add_argument('--cmd', type=str, dest='cmd', default='train', help='command')
-    parser.add_argument('--n_epochs', type=int, dest='n_epochs', default=10,
+    parser.add_argument('--n_epochs', type=int, dest='n_epochs', default=3,
                         help='training n_epochs')
     parser.add_argument('--batch_size', type=int, dest='batch_size', default=128,
                         help='batch size')
