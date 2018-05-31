@@ -52,8 +52,8 @@ def train(options):
             for batch_i in range(mnist.train.num_examples // batch_size):
                 batch_xs, _ = mnist.train.next_batch(batch_size)
                 trainbatch_noisy = batch_xs + 0.3 * np.random.randn(batch_xs.shape[0], 784)
-                sess.run(optm, feed_dict={x: trainbatch_noisy, y: batch_xs})
-                # print("[%02d/%02d] cost: %.4f" % (epoch_i, n_epochs, sess.run(cost, feed_dict={x: trainbatch_noisy, y: batch_xs})))
+                _, _cost = sess.run([optm, cost], feed_dict={x: trainbatch_noisy, y: batch_xs})
+                print("[%02d/%02d] cost: %.4f" % (epoch_i, n_epochs, _cost))
 
         print(pred)
 
@@ -75,17 +75,14 @@ def test():
     with tf.Session() as sess:
         sess.graph.as_default()
         tf.import_graph_def(graph_def, name='')
-
         sess.run(init)
-
         x_ = sess.graph.get_tensor_by_name('x:0')
         out_ = sess.graph.get_tensor_by_name('out_img:0')
 
-        n_examples = 1
-        test_xs, _ = mnist.test.next_batch(n_examples)
+        test_xs, _ = mnist.test.next_batch(1)
         test_xs_noisy = test_xs + 0.3 * np.random.randn(test_xs.shape[0], 784)
         recon = sess.run(out_, feed_dict={x_: test_xs_noisy})
-        fig, axs = plt.subplots(3, n_examples, figsize=(15, 4))
+        fig, axs = plt.subplots(3, 1, figsize=(15, 4))
 
         axs[0].matshow(np.reshape(test_xs, (28, 28)), cmap=plt.get_cmap('gray'))
         axs[1].matshow(np.reshape(test_xs_noisy, (28, 28)), cmap=plt.get_cmap('gray'))
