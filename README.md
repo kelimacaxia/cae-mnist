@@ -13,4 +13,4 @@ python3 cae-mnist.py --cmd test
 # git command
 git commit -a -m "Upload dataset"
 git push -u origin master
-git pull origin maste
+git pull origin master
