@@ -40,8 +40,7 @@ def train(options):
     cost = tf.reduce_sum(tf.square(pred - tf.reshape(y, shape=[-1, 28, 28, 1])), name='cost')
     optm = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
-    out_img = tf.reshape(pred, [28*28], name="out_img")
-
+    output = tf.reshape(pred, shape=[-1, 28*28], name="output")
     print("Start training..")
 
     init = tf.global_variables_initializer()
@@ -59,7 +58,7 @@ def train(options):
 
         print("Save model")
         graph_def = tf.get_default_graph().as_graph_def()
-        output_graph = graph_util.convert_variables_to_constants(sess, graph_def, ['out_img'])
+        output_graph = graph_util.convert_variables_to_constants(sess, graph_def, ['output'])
         with tf.gfile.GFile(os.path.join('./', 'mnist' + '.pb'), 'wb') as f:
             f.write(output_graph.SerializeToString())
 
@@ -77,7 +76,7 @@ def test():
         tf.import_graph_def(graph_def, name='')
         sess.run(init)
         x_ = sess.graph.get_tensor_by_name('x:0')
-        out_ = sess.graph.get_tensor_by_name('out_img:0')
+        out_ = sess.graph.get_tensor_by_name('ce3/output:0')
 
         test_xs, _ = mnist.test.next_batch(1)
         test_xs_noisy = test_xs + 0.3 * np.random.randn(test_xs.shape[0], 784)
