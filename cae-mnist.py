@@ -11,7 +11,8 @@ from tensorflow.python.framework import graph_util
 
 from argparse import ArgumentParser
 
-import model as model
+from model import cae_model as model
+
 import warnings
 import os
 
@@ -26,12 +27,10 @@ def train(options):
     batch_size = options.batch_size
     n_epochs = options.n_epochs
 
-    trainimgs = mnist.train.images
-
     print("Network ready")
     learning_rate = 0.001
 
-    dim = trainimgs.shape[1]
+    dim = mnist.train.images.shape[1]
     x = tf.placeholder(tf.float32, [None, dim], name='x')
     # x = tf.placeholder(tf.float32, [None, 28, 28, 1], name='x')
     y = tf.placeholder(tf.float32, [None, dim])
@@ -59,14 +58,13 @@ def train(options):
         print("Save model")
         graph_def = tf.get_default_graph().as_graph_def()
         output_graph = graph_util.convert_variables_to_constants(sess, graph_def, ['output'])
-        with tf.gfile.GFile(os.path.join('./', 'mnist' + '.pb'), 'wb') as f:
+        with tf.gfile.GFile(os.path.join('./', 'cae-mnist' + '.pb'), 'wb') as f:
             f.write(output_graph.SerializeToString())
 
 
 def test():
-    testimgs = mnist.test.images
 
-    with tf.gfile.GFile(os.path.join('./', 'mnist' + '.pb'), "rb") as f:
+    with tf.gfile.GFile(os.path.join('./', 'cae-mnist' + '.pb'), "rb") as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
 
@@ -74,9 +72,9 @@ def test():
     with tf.Session() as sess:
         sess.graph.as_default()
         tf.import_graph_def(graph_def, name='')
-        sess.run(init)
+           sess.run(init)
         x_ = sess.graph.get_tensor_by_name('x:0')
-        out_ = sess.graph.get_tensor_by_name('ce3/output:0')
+        out_ = sess.graph.get_tensor_by_name('output:0')
 
         test_xs, _ = mnist.test.next_batch(1)
         test_xs_noisy = test_xs + 0.3 * np.random.randn(test_xs.shape[0], 784)

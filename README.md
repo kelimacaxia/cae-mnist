@@ -7,12 +7,20 @@ python3 cae-mnist.py --cmd test
 
 # model conversion
 
-../tensorflow-pc/bazel-bin/tensorflow/contrib/lite/toco/toco    --input_file=./mnist.pb   --input_format=TENSORFLOW_GRAPHDEF  --output_format=TFLITE   --output_file=android/app/src/main/assets/mnist.tflite --inference_type=FLOAT   --input_type=FLOAT --input_arrays=x   --output_arrays=output --input_shapes=1,28,28,1
+../tensorflow/bazel-bin/tensorflow/contrib/lite/toco/toco   --input_file=./cae-mnist.pb   --input_format=TENSORFLOW_GRAPHDEF  --output_format=TFLITE   --output_file=android/app/src/main/assets/mnist.tflite --inference_type=FLOAT   --input_type=FLOAT --input_arrays=x   --output_arrays=output --input_shapes=1,28,28,1
 
+
+
+
+python3 rnn-mnist.py --cmd train
+
+python3 rnn-mnist.py --cmd test
+
+../tensorflow/bazel-bin/tensorflow/contrib/lite/toco/toco   --input_file=./rnn-mnist.pb   --input_format=TENSORFLOW_GRAPHDEF  --output_format=TFLITE   --output_file=android/app/src/main/assets/mnist.tflite --inference_type=FLOAT   --input_type=FLOAT --input_arrays=x   --output_arrays=output --input_shapes=1,28,28
 
 # git command
 git commit -a -m "Upload dataset"
-git commit README.md -m "Add git command"
+git commit *.py -m "Use conv2d  to repalce conv2d_transpos , because tflite doesn't support conv2d_transpos"
 git push -u origin master
 git pull origin master
 
