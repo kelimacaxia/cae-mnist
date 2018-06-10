@@ -72,7 +72,7 @@ def test():
     with tf.Session() as sess:
         sess.graph.as_default()
         tf.import_graph_def(graph_def, name='')
-           sess.run(init)
+        sess.run(init)
         x_ = sess.graph.get_tensor_by_name('x:0')
         out_ = sess.graph.get_tensor_by_name('output:0')
 
